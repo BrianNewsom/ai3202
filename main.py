@@ -41,6 +41,17 @@ class Graph:
 		# Because of the list composition, we do this in reverse of traditional order
 		return self.data[height - 1 - y][x]
 		
+class AStarSearch:
+	start = None
+	end = None
+	path = []
+	
+	def __init__(self, start, end):
+		self.start = start
+		self.end = end
+
+	def search(self):
+		return True
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
@@ -61,4 +72,6 @@ if __name__ == "__main__":
 			print v
 			g.add_to_data(Node(v), x)
 		x = x+1
-	
+
+	search = AStarSearch(g.get(0,0), g.get(width-1,height-1))
+	search.search()
