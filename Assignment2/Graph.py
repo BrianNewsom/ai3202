@@ -4,13 +4,12 @@ class Graph:
 		self.width = width
 		self.height = height
 		self.data = []
-		
 		# 2d array of Nodes
 		for i in range(0, height):
 			self.data.append([])
 
 	def add_to_data(self, node, x):
-		# print "adding " + str(node)
+		# Add data to node
 		self.data[x].append(node)
 
 	def print_graph(self):
@@ -23,8 +22,7 @@ class Graph:
 				print self.data[j][i].val
 	
 	def get(self, x, y):
-		# Index from bottom left corner (start node)
-		# Because of the list composition, we do this in reverse of traditional order
+		# Get node at given location, or if it doesn't exist return None
 		if x < 0 or y < 0:
 			return None
 		else:
@@ -34,9 +32,11 @@ class Graph:
 						return n
 
 	def setup_edges_node(self, node):
+		# For any given node, return all adjacent nodes that are valid
 		adjacent=[]
 		x = node.x
 		y = node.y
+		# All possible adjacent nodes
 		down_left = self.get(x-1,y-1)
 		down = self.get(x,y-1)
 		down_right = self.get(x+1,y-1)
@@ -47,6 +47,7 @@ class Graph:
 		left = self.get(x-1, y)
 		
 		for x in [down_left, down, down_right, right, up_right, up, up_left, left]:
+			# Don't count as adjacent if it's a wall
 			if x is not None and x.val is not 2:
 				# Set costs (diag different)
 				additional_cost = 0
@@ -63,5 +64,6 @@ class Graph:
 		return adjacent
 
 	def setup_edges(self,x,y):
+		# Wraps setup_edges_node if we only have the grid location
 		node = self.get(x,y)
 		return setup_edges_node(node)

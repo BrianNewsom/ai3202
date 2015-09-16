@@ -1,4 +1,7 @@
+import math
+
 class AStarSearch:
+	# The maximum number to follow when printing path, in case we have a loop
 	MAX_PATH_LENGTH=100
 	
 	def __init__(self, start, end, g, heuristic):
@@ -11,6 +14,7 @@ class AStarSearch:
 		self.locations_evaluated = 1 
 
 	def heuristic(self, n):
+		# Dispatches to correct heurstic function
 		if self.chosen_heuristic == "manhattan":
 			return self.manhattan_distance(n)
 		elif self.chosen_heuristic =="two_norm":
@@ -25,7 +29,7 @@ class AStarSearch:
 		return 10 * (abs(n.x-self.end.x) + abs(n.y - self.end.y))
 		
 	def update_node(self, node, parent, move_cost):
-		# print "Updating parent of " + str(node) + " to " + str(parent)
+		# Update information for a given node - specifically cost and parent
 		node.parent = parent
 		# Update actual distance
 		node.g = move_cost + parent.g
@@ -35,26 +39,27 @@ class AStarSearch:
 		node.cost = node.g + node.h
 	
 	def search(self):
-		print "Beginning search"
+		# Run actual search algorithm
+		# Begin at start node
 		open = [self.start]
 		closed = []
 		while len(open) > 0:
-			# print "iter"
+			# Grab minimum cost node out of list
 			node = min(open, key=lambda n: n.cost)
 			open.remove(node)
 			if node is not self.end:
-				# print "Node is not end"
+				# If we haven't found the end 
 				closed.append(node)
 				# Add adjacent edges
 				for (adj, move_cost) in self.g.setup_edges_node(node):
-					# print "Search adjacent node"
+					# As long as it is not already finished
 					if adj not in closed:
 						if adj in open:
-							# print "n open"
-							# Check if current path is better than previously found path
+								# Check if current path is better than previously found path
 							if adj.g > (node.g + move_cost):
 								self.update_node(adj, node, move_cost)
 						else:
+							# Otherwise give it info for the first time and add it to open
 							self.update_node(adj, node, move_cost)
 							open.append(adj)
 							self.locations_evaluated = self.locations_evaluated + 1
@@ -63,6 +68,7 @@ class AStarSearch:
 				break
 		
 	def print_output(self):
+		# Print assignment specified output
 		path = self.get_path(self.end)
 		print """
 ===========================Search Complete=================================
@@ -75,6 +81,7 @@ The optimal path was:
 		""" % (self.chosen_heuristic, self.end.cost, self.locations_evaluated, path)
 		
 	def get_path(self, node):
+		# Get path to a given node from the start node
 		path = []
 		cursor = node
 		# Maximum just in case
