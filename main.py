@@ -26,6 +26,7 @@ class Node:
 	
 	def __repr__(self):
 		output = "NODE: val=%s, cost so far=%s estimated cost=%s, loc=(%s,%s)" % (self.val, self.g, self.cost, self.x, self.y)
+		# output = output + " parent=" + str(self.parent)
 		return output 
 
 	
@@ -64,9 +65,10 @@ class Graph:
 					if n.x is x and n.y is y:
 						return n
 
-	def setup_edges(self,x,y):
-		node = self.get(x,y)
-		# Get nodes
+	def setup_edges_node(self, node):
+		adjacent=[]
+		x = node.x
+		y = node.y
 		down_left = self.get(x-1,y-1)
 		down = self.get(x,y-1)
 		down_right = self.get(x+1,y-1)
@@ -76,37 +78,42 @@ class Graph:
 		up_left = self.get(x-1,y+1)
 		left = self.get(x-1, y)
 		
-		print "edge for node" + str(node)
 		for x in [down_left, down, down_right, right, up_right, up, up_left, left]:
 			if x is not None and x.val is not 2:
 				# Set costs (diag different)
+				additional_cost = 0
 				if x in [down_left, down_right, up_left, up_right]:
-					print "diag"
-					x.g = 14
+					additional_cost = 14
 				else:
-					x.g = 10
+					additional_cost = 10
 				
 				# We have extra cost if space is a mountain
 				if x.val is 1:
-					x.g = x.g + 10
+					additional_cost = additional_cost + 10
 
-				node.adjacent.append([x,x.g])
+				adjacent.append([x,additional_cost])
+		return adjacent
 
+	def setup_edges(self,x,y):
+		node = self.get(x,y)
+		return setup_edges_node(node)
 		
 class AStarSearch:
 	
-	def __init__(self, start, end, heuristic):
+	def __init__(self, start, end, g, heuristic):
 		self.path = []
 		self.start = start
-		self.start.cost = 0
 		self.end = end
 		self.chosen_heuristic = heuristic
+		self.g = g
 
 	def heuristic(self, n):
 		if self.chosen_heuristic == "manhattan":
 			return self.manhattan_distance(n)
-		else:
+		elif self.chosen_heuristic =="two_norm":
 			return self.two_norm_distance(n)
+		else:
+			raise Exception('Invalid choice of heuristic')
 	
 	def two_norm_distance(self, n):
 		return 10 * math.sqrt(math.pow((n.x - self.end.x),2) + math.pow((n.y - self.end.y),2))
@@ -114,11 +121,11 @@ class AStarSearch:
 	def manhattan_distance(self, n):
 		return 10 * (abs(n.x-self.end.x) + abs(n.y - self.end.y))
 		
-	def update_node(self, node, parent):
+	def update_node(self, node, parent, move_cost):
 		# print "Updating parent of " + str(node) + " to " + str(parent)
 		node.parent = parent
 		# Update actual distance
-		node.g = node.g + parent.g
+		node.g = move_cost + parent.g
 		# Update heuristic
 		node.h = self.heuristic(node)
 		# Set final cost
@@ -136,20 +143,17 @@ class AStarSearch:
 				# print "Node is not end"
 				closed.append(node)
 				# Add adjacent edges
-				# print node.adjacent
-				for (n, move_cost) in node.adjacent:
+				for (adj, move_cost) in g.setup_edges_node(node):
 					# print "Search adjacent node"
-					if n not in closed and n.val is not 2:
-						if n in open:
+					if adj not in closed:
+						if adj in open:
 							# print "n open"
 							# Check if current path is better than previously found path
-							if n.g > node.g + move_cost:
-								# print "replacing cost"
-								self.update_node(n, node)
+							if adj.g > (node.g + move_cost):
+								self.update_node(adj, node, move_cost)
 						else:
-							# print "other replacing cost"
-							self.update_node(n, node)
-							open.append(n)
+							self.update_node(adj, node, move_cost)
+							open.append(adj)
 			else:
 				print "Found end node"
 				# Print path
@@ -194,10 +198,11 @@ if __name__ == "__main__":
 			y = y-1
 			list_index = list_index + 1
 
-	for x in range(0, width):
-		for y in range(0, height):
-			g.setup_edges(x,y)
+	
+	#for x in range(0, width):
+	#	for y in range(0, height):
+	#		g.setup_edges(x,y)
 
-	search = AStarSearch(g.get(0,0), g.get(width-1,height-1), args.heuristic)
+	search = AStarSearch(g.get(0,0), g.get(width-1,height-1), g, args.heuristic)
 	search.search()
 
