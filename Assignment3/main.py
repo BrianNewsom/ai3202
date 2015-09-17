@@ -3,7 +3,7 @@ import argparse
 from Node import Node
 from Graph import Graph
 from AStarSearch import AStarSearch
-from Util import *
+from util import *
 		
 			
 # Width and height of graph grid, must be redefined for various graphs
