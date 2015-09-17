@@ -17,16 +17,23 @@ class AStarSearch:
 		# Dispatches to correct heurstic function
 		if self.chosen_heuristic == "manhattan":
 			return self.manhattan_distance(n)
-		elif self.chosen_heuristic =="two_norm":
-			return self.two_norm_distance(n)
+		elif self.chosen_heuristic =="diagonal":
+			return self.diagonal_distance(n)
 		else:
 			raise Exception('Invalid choice of heuristic')
 	
+	def diagonal_distance(self, n):
+		dx = abs(n.x - self.end.x)
+		dy = abs(n.y - self.end.y)
+		return 10 * (dx + dy) + (14 - 2 * 10) * min(dx, dy)
+		
 	def two_norm_distance(self, n):
-		return 10 * math.sqrt(math.pow((n.x - self.end.x),2) + math.pow((n.y - self.end.y),2))
+		return 14 * math.sqrt(math.pow((n.x - self.end.x),2) + math.pow((n.y - self.end.y),2))
 
 	def manhattan_distance(self, n):
-		return 10 * (abs(n.x-self.end.x) + abs(n.y - self.end.y))
+		dx = abs(n.x - self.end.x)
+		dy = abs(n.y - self.end.y)
+		return 10 * (dx + dy)
 		
 	def update_node(self, node, parent, move_cost):
 		# Update information for a given node - specifically cost and parent

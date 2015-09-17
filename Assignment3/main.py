@@ -15,7 +15,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("input_file", help="The name of the file to treat as the search space")
 	parser.add_argument("heuristic", help="Name of search heuristic to use in A* search", 
-		choices=("manhattan", "two_norm"), default="manhattan")
+		choices=("manhattan", "diagonal"), default="manhattan")
 	args = parser.parse_args()
 
 	# open file
