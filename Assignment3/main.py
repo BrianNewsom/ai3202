@@ -23,7 +23,7 @@ if __name__ == "__main__":
 	g = Graph(WIDTH, HEIGHT)
 
 	# Create our graph structure to traverse
-	create_graph_from_file(f, g, HEIGHT)
+	create_graph_from_file(f, g)
 
 	# Create and perform A* search
 	search = AStarSearch(g.get(0,0), g.get(WIDTH-1,HEIGHT-1), g, args.heuristic)

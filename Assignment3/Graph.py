@@ -1,16 +1,15 @@
 class Graph:
 
 	def __init__(self, width, height):
-		self.width = width
-		self.height = height
 		self.data = []
-		# 2d array of Nodes
-		for i in range(0, height):
-			self.data.append([])
 
 	def add_to_data(self, node, x):
 		# Add data to node
-		self.data[x].append(node)
+		try:
+			self.data[x].append(node)
+		except IndexError:
+			# If out of bounds, add a row
+			self.data.append([node])
 
 	def print_graph(self):
 		# Print out graph in human readable way to verify
@@ -26,10 +25,11 @@ class Graph:
 		if x < 0 or y < 0:
 			return None
 		else:
-			for l in self.data:
-				for n in l:
-					if n.x is x and n.y is y:
-						return n
+			try:
+				# We have our x and y coords switched, simpler access
+				return self.data[y][x]
+			except IndexError:
+				return None
 
 	def setup_edges_node(self, node):
 		# For any given node, return all adjacent nodes that are valid
