@@ -70,7 +70,6 @@ class Graph:
 		return adjacent
 	
 	def turn_left(self, direction): 
-		print self.ACTIONS
 		return self.ACTIONS[self.ACTIONS.index(direction)-1]
 	
 	def turn_right(self, direction):
