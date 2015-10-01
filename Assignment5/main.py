@@ -25,6 +25,10 @@ if __name__ == "__main__":
 
 	# Create and perform A* search
 
-	v = ValueIteration(g, (0,0), 0.9)
+	v = ValueIteration(g, (0,0), (9,7), 0.9)
 
-	v.run(0.5)
+	util = v.run(0.5)
+	v.set_rewards(util)
+
+	path = v.trace_path()
+	print path

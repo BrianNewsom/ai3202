@@ -24,3 +24,5 @@ def set_locations(g):
 			x = x + 1
 		y = y + 1
 
+def tuple_add(a, b):
+	return (a[0] + b[0], a[1] + b[1])
