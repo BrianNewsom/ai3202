@@ -54,17 +54,22 @@ class Graph:
 		
 		for direction in [down, right, up, left]:
 			# Don't count as adjacent if it's a wall
-			if direction is not None and direction.val is not 2:
-				# Set probabilities for given directions
-				if direction.dir is main_direction:
-					direction.prob = prob_main
-				elif direction.dir is self.turn_left(direction.dir):
-					direction.prob = prob_left
-				elif direction.dir is self.turn_right(direction.dir):
-					direction.prob = prob_right
-				else:
-					# Should I still append these?
-					direction.prob = 0
+			# Set probabilities for given directions
+
+			if direction.val is 2:
+				direction = node
+
+			if direction.dir is main_direction:
+				direction.prob = prob_main
+			elif direction.dir is self.turn_left(direction.dir):
+				direction.prob = prob_left
+			elif direction.dir is self.turn_right(direction.dir):
+				direction.prob = prob_right
+			else:
+				# Should I still append these?
+				direction.prob = 0
+	
+			
 
 				adjacent.append([direction.prob, direction])
 		return adjacent
