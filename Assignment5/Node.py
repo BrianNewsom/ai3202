@@ -1,9 +1,9 @@
 class Node:
 	reward_values = {
 		0: 0,
-		1: -1,
-		2: 0,
-		3: -2,
+		1: (-1),
+		2: -1000000,
+		3: (-2),
 		4: 1,
 		50: 50
 	}
@@ -16,7 +16,8 @@ class Node:
 		self.parent = None
 		# Sum total cost
 		self.reward = self.reward_values[int(val)]
-		self.action = None
+		self.util = 0.0
+		self.delta = 100
 
 	def set_loc(self, x, y):
 		# Set x and y coords for a node
@@ -25,7 +26,5 @@ class Node:
 	
 	def __repr__(self):
 		# Print function for node
-		output = "NODE: val=%s, reward=%s, loc=(%s,%s) action=%s" % (self.val, self.reward, self.x, self.y, self.action)
-		# Uncomment to view parents (this looks nasty if we leave it, but is helpful for debugging)
-		# output = output + " parent=" + str(self.parent)
+		output = "NODE: val=%s, reward=%s, util=%s,loc=(%s,%s)" % (self.val, self.reward, self.util, self.x, self.y)
 		return output 
