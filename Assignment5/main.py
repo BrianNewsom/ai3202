@@ -14,6 +14,7 @@ if __name__ == "__main__":
 	# Command line parser
 	parser = argparse.ArgumentParser()
 	parser.add_argument("input_file", help="The name of the file to treat as the search space")
+	parser.add_argument("--epsilon", help="The epsilon value for the value iteration", default=0.5, type=float)
 	args = parser.parse_args()
 
 	# open file
@@ -25,10 +26,11 @@ if __name__ == "__main__":
 
 	# Create and perform A* search
 
-	v = ValueIteration(g, (0,0), (9,7), 0.9)
+	v = ValueIteration(0.9)
 
-	util = v.run(0.5)
-	v.set_rewards(util)
+	v.run(g, args.epsilon)
 
-	path = v.trace_path()
+	path = v.search(g, 0, 0)
 	print path
+
+	
