@@ -1,7 +1,7 @@
-# A\* Search
+# Value Iteration
 ## Author: Brian Newsom
 
-This program computes A value iteration to provide an optimal route through a given world. Further parameters can be found in Assignment5.pdf.
+This program computes a value iteration to provide an optimal route through a given world. Further parameters can be found in Assignment5.pdf.
 
 The input files are in the input folders.
 

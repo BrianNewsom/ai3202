@@ -3,7 +3,7 @@ from util import *
 from Graph import *
 
 class ValueIteration:
-	MAX_ITERATIONS = 100
+	MAX_ITERATIONS = 1000
 	ACTIONS = ['right', 'up', 'left', 'down']
 	ACTIONS_VECTORS = [(1,0), (0,1), (-1, 0), (0, -1)]
 
@@ -60,9 +60,9 @@ class ValueIteration:
 				return util
 
 
-	def set_rewards(self, reward_dict):
+	def set_utils(self, util_dict):
 		for s in self.states:
-			s.reward = reward_dict[(s.x,s.y)]
+			s.util = util_dict[(s.x,s.y)]
 		return
 
 	def trace_path(self):
@@ -72,7 +72,6 @@ class ValueIteration:
 		end_node = self.g.get(self.end[0],self.end[1])
 		
 		full_path = [start_node]
-		simple_path = [(start_node.x,start_node.y)]
 		# Initialize s to start_node
 		s = start_node
 		for i in range(0, max_path_length):
@@ -81,16 +80,15 @@ class ValueIteration:
 			new_coord = tuple_add((s.x,s.y),movement)
 			s = self.g.get(new_coord[0], new_coord[1])
 			full_path.append(s)
-			simple_path.append((s.x,s.y))
 			if s is end_node:
 				print """
 ===========================Value Iteration Complete========================
-Successfully finished pathfinding using AStar Value Iteration.
+Successfully finished pathfinding using Value Iteration.
 The epsilon value used was: %s
-The optimal path was
+The optimal path was:
 %s
 ===========================================================================
-				""" % (self.epsilon, simple_path)
+				""" % (self.epsilon, full_path)
 				return full_path
 		print "No path found"
 		return None

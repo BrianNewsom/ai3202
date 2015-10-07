@@ -30,7 +30,7 @@ if __name__ == "__main__":
 	v = ValueIteration(g, (0,0), (WIDTH-1,HEIGHT-1), GAMMA, args.epsilon)
 
 	util = v.run()
-	v.set_rewards(util)
+	v.set_utils(util)
 
 	path = v.trace_path()
 	# Print path to see verbose information about each node on the path 
