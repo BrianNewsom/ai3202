@@ -67,6 +67,8 @@ class Graph:
 					continue
 
 				adjacent.append([direction.prob, direction])
+			else:
+				adjacent.append([0, node])
 		return adjacent
 	
 	def turn_left(self, direction): 

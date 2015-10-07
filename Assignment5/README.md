@@ -55,3 +55,8 @@ The optimal path was:
 [(0,0) util=0.684006507633, (0,1) util=0.950009038379, (0,2) util=1.31945699776, (0,3) util=1.83257916356, (1,3) util=2.54524883829, (1,4) util=3.53506783096, (1,5) util=3.52092754301, (2,5) util=4.89017714307, (3,5) util=6.79191269873, (4,5) util=9.43321208156, (4,6) util=13.1016834466, (4,7) util=18.1967825648, (5,7) util=26.6621980066, (6,7) util=37.0308305648, (7,7) util=52.8205980066, (8,7) util=74.7508305648, (9,7) util=103.820598007]
 ===========================================================================
 ```
+
+
+One would expect the value iteration to find a different path for varying epsilon, but as we see, this is not
+actually the case.  Any convergence seems to lead to the optimal path that Value Iteration can select under
+these paramaters.

@@ -53,11 +53,12 @@ class ValueIteration:
 			
 				action_chosen = self.ACTIONS[max_index]
 				s.action = action_chosen
-				new_util[(s.x, s.y)] = self.R(s) + self.gamma * max(possible_sums)
+				new_util[(s.x, s.y)] = self.R(s) + self.gamma * maximized
 				delta = max(delta, abs(util[(s.x, s.y)] - new_util[(s.x, s.y)]))
 			if delta < ((self.epsilon * (1 - self.gamma)) / self.gamma ):
 				print "Found on iteration %d" % iter
-				return util
+				return new_util
+			# print util
 
 
 	def set_utils(self, util_dict):
