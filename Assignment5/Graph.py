@@ -64,7 +64,7 @@ class Graph:
 					direction.prob = prob_right
 				else:
 					# Should I still append these?
-					direction.prob = 0
+					continue
 
 				adjacent.append([direction.prob, direction])
 		return adjacent
