@@ -19,16 +19,8 @@ def main():
 		elif o in ("-m"):
 			print calc_marginal(net, a)
 		elif o in ("-g"):
-			print "flag", o
-			print "args", a
-			print type(a)
-			'''you may want to parse a here and pass the left of |
-			and right of | as arguments to calcConditional
-			'''
-			p = a.find("|")
-			print a[:p]
-			print a[p+1:]
-			#calcConditional(a[:p], a[p+1:])
+			(var, given) = a.split('|')
+			calc_conditional(net, var, given) 
 		elif o in ("-j"):
 			print "flag", o
 			print "args", a
@@ -90,7 +82,10 @@ def calc_marginal(net, arg):
 
 		return xray
 
-# def calcConditional(var, given)
+def calc_conditional(net,var, given):
+	print "Calculating conditional probability of {0} given {1}".format(var, given)
+
+	return None
 
 if __name__ == "__main__":
     main()
