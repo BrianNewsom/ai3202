@@ -5,6 +5,16 @@
 * -m marginal probability
 * -p to set a prior for Pollution or Smoking
 
+### Example Usages
+For example (these are the primary use cases)
+* -mD is the marginal probability distribution of Dyspnoea
+* -jPSC is the joint probabilities for Pollution, Smoker, and Cancer
+* -jpsc is the joint probability for pollution = low, smoker = true, cancer = true
+* -j~p~s~c is the joint probability for pollution = high, smoker = false, cancer = false
+* -gc|s is the conditional probability for Cancer given that someone is a smoker.
+* -pS .40 sets the probability that smoking is True to .40.
+* -pP = .80 sets the probability that pollution is Low to .80.
+
 ## Appendix
 
 ### Probability 

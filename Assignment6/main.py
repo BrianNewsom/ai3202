@@ -1,4 +1,4 @@
-import getopt, sys
+import getopt, sys, re
 
 from bayes import *
 
@@ -24,10 +24,26 @@ def main():
 		elif o in ("-j"):
 			print "flag", o
 			print "args", a
+			parsed_args = parse_joint(a)
 		else:
 			assert False, "unhandled option"
 		
     # ...
+
+def parse_joint(args):
+	parsed = []
+	arg_len = len(args)
+	next_has_tilde = False
+	for i in range(0,arg_len):
+		if args[i] is "~":
+			next_has_tilde = True
+		else:
+			if next_has_tilde:
+				parsed.append("~"+args[i])
+				next_has_tilde = False
+			else:
+				parsed.append(args[i])
+	return parsed
 
 def set_prior(net, variable, new_value):
 	# Set a marginal probability for smoking or pollution
@@ -57,7 +73,7 @@ def calc_marginal(net, arg):
 
 		cancer = net.nodes["cancer"]
 		# Sum over all possibilities of p and s
-		cancer.marginal = cancer.conditionals["ps"]*pollution.marginal + cancer.conditionals["~ps"]*(1-pollution.marginal)*(smoker.marginal) + cancer.conditionals["p~s"]*pollution.marginal*(1-smoker.marginal) + cancer.conditionals["~p~s"]*(1-pollution.marginal)*(1-smoker.marginal)
+		cancer.marginal = cancer.conditionals["ps"]*pollution.marginal*smoker.marginal + cancer.conditionals["~ps"]*(1-pollution.marginal)*(smoker.marginal) + cancer.conditionals["p~s"]*pollution.marginal*(1-smoker.marginal) + cancer.conditionals["~p~s"]*(1-pollution.marginal)*(1-smoker.marginal)
 		return cancer
 
 	elif arg is "D" or arg is "d":
