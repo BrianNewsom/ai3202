@@ -1,10 +1,11 @@
 class Node:
-	def __init__(self, name, parents):
+	def __init__(self, name, abbrev, parents):
 		self.name = name
 		self.parents = parents
 		self.children = []
 		self.marginal = 0.0
 		self.conditionals = {}
+		self.abbrev = abbrev
 
 	def add_child(self, child):
 		self.children.append(child)
@@ -17,17 +18,17 @@ class BayesNet:
 		self.nodes = {}
 
 	def create_network(self):
-		pollution = Node("pollution", None)
-		smoker = Node("smoker", None)
+		pollution = Node("pollution", "p", None)
+		smoker = Node("smoker", "s", None)
 
-		cancer = Node("cancer", [pollution, smoker])
+		cancer = Node("cancer", "c", [pollution, smoker])
 		pollution.add_child(cancer)
 		smoker.add_child(cancer)
 
-		xray = Node("xray", [cancer])
+		xray = Node("xray", "x", [cancer])
 		cancer.add_child(xray)
 
-		dyspnoea = Node("dyspnoea", [cancer])
+		dyspnoea = Node("dyspnoea", "d", [cancer])
 		dyspnoea.add_child(dyspnoea)
 
 		# Define marginal from info

@@ -22,9 +22,8 @@ def main():
 			(var, given) = a.split('|')
 			print calc_conditional(net, var, given) 
 		elif o in ("-j"):
-			print "flag", o
-			print "args", a
 			parsed_args = parse_joint(a)
+			calc_joint(net, parsed_args)
 		else:
 			assert False, "unhandled option"
 		
@@ -45,6 +44,30 @@ def parse_joint(args):
 				parsed.append(args[i])
 	return parsed
 
+def calc_joint(net, vars):
+	print "Calculating joint probability for {0}".format(vars)
+
+	cancer = net.nodes["cancer"]
+	pollution = net.nodes["pollution"]
+	smoker = net.nodes["smoker"]
+	# prob of 
+	if "P" in vars and "S" in vars and "C" in vars:
+		print "P(P,S,C) " + str(cancer.conditionals["ps"] * pollution.marginal * smoker.marginal)
+		print "P(P,S,~C) " + str(cancer.conditionals["p~s"] * pollution.marginal * (1 - smoker.marginal))
+		print "P(~P,~S,C) " + str(cancer.conditionals["~ps"] * (1 - pollution.marginal) * smoker.marginal)
+		print "P(~P,~S,C) " + str(cancer.conditionals["~p~s"] * (1 - pollution.marginal) * (1 - smoker.marginal))
+
+		print "P(P,S,~C) " + str((1-cancer.conditionals["ps"]) * pollution.marginal * smoker.marginal)
+		print "P(P,~S,~C) " + str((1-cancer.conditionals["p~s"]) * pollution.marginal * (1 - smoker.marginal))
+		print "P(~P,S,~C) " + str((1-cancer.conditionals["~ps"]) * (1 - pollution.marginal) * smoker.marginal)
+		print "P(~P,~S,~C) " + str((1-cancer.conditionals["~p~s"]) * (1 - pollution.marginal) * (1 - smoker.marginal))
+
+	elif "p" in vars and "s" in vars and "c" in vars:
+		print "P(P,S,C) " + str(cancer.conditionals["ps"] * pollution.marginal * smoker.marginal)
+
+	elif "~p" in vars and "~s" in vars and "~c" in vars:
+		print "P(~P,~S,~C) " + str((1-cancer.conditionals["~p~s"]) * (1 - pollution.marginal) * (1 - smoker.marginal))
+		
 def set_prior(net, variable, new_value):
 	# Set a marginal probability for smoking or pollution
 	print "Setting prior for variable {0} to {1}".format(variable, new_value)
