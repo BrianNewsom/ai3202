@@ -20,7 +20,7 @@ def main():
 			print calc_marginal(net, a)
 		elif o in ("-g"):
 			(var, given) = a.split('|')
-			calc_conditional(net, var, given) 
+			print calc_conditional(net, var, given) 
 		elif o in ("-j"):
 			print "flag", o
 			print "args", a
@@ -82,8 +82,14 @@ def calc_marginal(net, arg):
 
 		return xray
 
-def calc_conditional(net,var, given):
+def calc_conditional(net, var, given):
 	print "Calculating conditional probability of {0} given {1}".format(var, given)
+	if var is given:
+		return 1
+	else:
+		# Now our given probability is 1, so we can calculate a marginal with the first var certain 
+		net = set_prior(net, given, 1)
+		return calc_marginal(net, var)
 
 	return None
 
