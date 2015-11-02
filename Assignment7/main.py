@@ -242,6 +242,74 @@ def ThreeB():
 	probability = float(len(matching_nets))/len(nets)
 	print "Finished Problem 3B, P(c = true | r = true) = {0}".format(probability)
 
+def ThreeC():
+	# Since we need all info to calculate the probability of wet, we are doing the same thing as in OneC
+	OneC()
+
+def ThreeD():
+	# Similar to above, however this time we are given cloudy. This means any non-cloudy experiment can be immediately tossed.
+	i = iter(samples)
+
+	nets = []
+
+	s = next(i, None) 
+	while s is not None:
+		net = Bayes()
+		if net.nodes["cloudy"].marginal >= s:
+			net.nodes["cloudy"].value = True
+			s = next(i, None)
+			if net.nodes["rain"].conditionals["c"] >= s:
+				net.nodes["rain"].value = True
+			else:
+				# Not raining, we don't care about anything moving forward
+				net.nodes["rain"].value = False
+
+			s = next(i, None)
+
+			if (net.nodes["sprinkler"].conditionals["c"] >= s):
+				net.nodes["sprinkler"].set_value(True)
+			else:
+				net.nodes["sprinkler"].set_value(False)
+		else:
+			net.nodes["cloudy"].value = False
+			# We can stop now
+			s = next(i, None)
+			continue
+		# Now set wet correctly
+		s = next(i, None)
+
+		wet = net.nodes["wet"]
+		rain = net.nodes["rain"]
+		sprinkler = net.nodes["sprinkler"]
+
+		if (sprinkler.value is True and rain.value is True):
+			if (wet.conditionals["sr"] >= s):
+				wet.set_value(True)
+		elif (sprinkler.value is True and rain.value is False):
+			if (wet.conditionals["s~r"] >= s):
+				wet.set_value(True)
+		elif (sprinkler.value is False and rain.value is True):
+			if (wet.conditionals["~sr"] >= s):
+				wet.set_value(True)
+		else:
+			wet.set_value(False)
+
+		nets.append(net)
+
+	matching_nets = []
+	for n in nets:
+		if n.nodes["cloudy"].value and n.nodes["wet"].value:
+			matching_nets.append(n)
+		
+
+	final_nets = []
+	for n in matching_nets:
+		if n.nodes["sprinkler"].value:
+			final_nets.append(n)
+
+	probability = float(len(final_nets)) / len(matching_nets)
+	print "Finished Problem 3D, P(s = true | c = true, w = true) = {0}".format(probability)
+
 if __name__ == "__main__":
 	OneA()
 	OneB()
@@ -249,3 +317,5 @@ if __name__ == "__main__":
 	OneD()
 	ThreeA()
 	ThreeB()
+	ThreeC()
+	ThreeD()
