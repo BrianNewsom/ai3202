@@ -68,7 +68,7 @@ class Bayes:
 		for n in self.nodes:
 			n.value = None
 
-	def traverse(self, iterator):
+	def prior_sample(self, iterator):
 		# Takes in 4 samples
 		cloudy = self.nodes["cloudy"]
 		sprinkler = self.nodes["sprinkler"]
@@ -121,7 +121,7 @@ def OneA():
 	i = iter(samples)
 	for _ in range(0, num_trials):
 		net = Bayes()
-		net.traverse(i)
+		net.prior_sample(i)
 
 		if net.nodes["cloudy"].value:
 			matching_nets.append(net)
@@ -134,7 +134,7 @@ def OneB():
 	i = iter(samples)
 	for _ in range(0, num_trials):
 		net = Bayes()
-		net.traverse(i)
+		net.prior_sample(i)
 		if net.nodes["rain"].value:
 			matching_nets.append(net)
 
@@ -151,7 +151,7 @@ def OneC():
 	i = iter(samples)
 	for _ in range(0, num_trials):
 		net = Bayes()
-		net.traverse(i)
+		net.prior_sample(i)
 		if net.nodes["wet"].value:
 			matching_nets.append(net)
 
@@ -168,7 +168,7 @@ def OneD():
 	i = iter(samples)
 	for _ in range(0, num_trials):
 		net = Bayes()
-		net.traverse(i)
+		net.prior_sample(i)
 		if net.nodes["wet"].value:
 			matching_nets.append(net)
 
@@ -186,9 +186,66 @@ def OneD():
 	probability = float(len(final_nets)) / len(matching_nets2)
 	print "Finished Problem 1D, P(s = true | c = true, w = true) = {0}".format(probability)
 
+# Rejection sampling
+def ThreeA():
+	net = Bayes()
+	i = iter(samples)
+
+	cloudy_true = 0
+
+	s = next(i, None)
+	while s is not None:
+		# Only calculate C, that's all we care about
+		if s >= net.nodes["cloudy"].marginal:
+			cloudy_true = cloudy_true + 1
+		s = next(i, None)
+
+	probability = float(cloudy_true)/len(samples)
+	print "Finished Problem 3A, P(c = true) = {0}".format(probability)
+
+def ThreeB():
+	# Now we only care about cloudy and rain
+	i = iter(samples)
+
+	nets = []
+
+	s = next(i, None) 
+	while s is not None:
+		net = Bayes()
+		if net.nodes["cloudy"].marginal >= s:
+			net.nodes["cloudy"].value = True
+			s = next(i, None)
+			if net.nodes["rain"].conditionals["c"] >= s:
+				net.nodes["rain"].value = True
+				nets.append(net)
+			else:
+				# Not raining, we don't care about anything moving forward
+				net.nodes["rain"].value = False
+			s = next(i, None)
+		else:
+			net.nodes["cloudy"].value = False
+			s = next(i, None)
+			if net.nodes["rain"].conditionals["~c"] >= s:
+				net.nodes["rain"].value = True
+				nets.append(net)
+			else:
+				# Not raining, we don't care about anything moving forward
+				net.nodes["rain"].value = False
+			s = next(i, None)
+
+	matching_nets = []
+
+	for n in nets:
+		if n.nodes["cloudy"].value and n.nodes["rain"].value:
+			matching_nets.append(n)
+
+	probability = float(len(matching_nets))/len(nets)
+	print "Finished Problem 3B, P(c = true | r = true) = {0}".format(probability)
 
 if __name__ == "__main__":
 	OneA()
 	OneB()
 	OneC()
 	OneD()
+	ThreeA()
+	ThreeB()
