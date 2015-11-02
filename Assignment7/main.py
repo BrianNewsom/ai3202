@@ -55,6 +55,15 @@ class Bayes:
 		self.nodes["rain"] = rain
 		self.nodes["wet"] = wet
 
+
+	def __str__(self):
+		string = "NET\n"
+		for n in self.nodes:
+			node = self.nodes[n]
+			string = string + "{0} - {1}\n".format(n, node.value)
+
+		return string
+
 	def clear_net(self):
 		for n in self.nodes:
 			n.value = None
@@ -96,55 +105,90 @@ class Bayes:
 		if (sprinkler.value is True and rain.value is True):
 			if (wet.conditionals["sr"] >= scoped_samples[3]):
 				wet.set_value(True)
-			elif (wet.conditionals["s~r"] >= scoped_sample[3]):
+		elif (sprinkler.value is True and rain.value is False):
+			if (wet.conditionals["s~r"] >= scoped_samples[3]):
 				wet.set_value(True)
-			elif (wet.conditionals["~sr"] >= scoped_sample[3]):
+		elif (sprinkler.value is False and rain.value is True):
+			if (wet.conditionals["~sr"] >= scoped_samples[3]):
 				wet.set_value(True)
-			else:
-				wet.set_value(False)
-
-def get_total_cloudy(nets):
-	cloudy_true = 0
-	sprinkler_true = 0
-	rain_true = 0
-	wet_true = 0
-	
-	for n in nets:
-		if n.nodes["cloudy"].value is True:
-			cloudy_true = cloudy_true + 1
-		'''
-		if n.nodes["sprinkler"].value is True:
-			sprinkler_true = sprinkler_true + 1
-		if n.nodes["rain"].value is True:
-			rain_true = rain_true + 1
-		if n.nodes["wet"].value is True:
-			wet_true = wet_true + 1
-		'''
-
-	return cloudy_true # , sprinkler_true, rain_true, wet_true)
+		else:
+			wet.set_value(False)
 
 num_trials = 25
 def OneA():
-	finished_nets = []
+	matching_nets = []
 
 	i = iter(samples)
 	for _ in range(0, num_trials):
 		net = Bayes()
 		net.traverse(i)
 
-		finished_nets.append(net)
+		if net.nodes["cloudy"].value:
+			matching_nets.append(net)
 
-	cloudy = get_total_cloudy(finished_nets)
-	
-	probability = float(cloudy) / num_trials
+	probability = float(len(matching_nets)) / num_trials
 	print "Finished Problem 1A, P(c = true) = {0}".format(probability)
 
 def OneB():
-	net = Bayes()
-	cloudy = net.nodes["cloudy"]
+	matching_nets = []
+	i = iter(samples)
+	for _ in range(0, num_trials):
+		net = Bayes()
+		net.traverse(i)
+		if net.nodes["rain"].value:
+			matching_nets.append(net)
 
-	print "oops"
+	final_nets = []
+	for n in matching_nets:
+		if n.nodes["cloudy"].value:
+			final_nets.append(n)
+
+	probability = float(len(final_nets)) / len(matching_nets)
+	print "Finished Problem 1B, P(c = true | r = true) = {0}".format(probability)
+
+def OneC():
+	matching_nets = []
+	i = iter(samples)
+	for _ in range(0, num_trials):
+		net = Bayes()
+		net.traverse(i)
+		if net.nodes["wet"].value:
+			matching_nets.append(net)
+
+	final_nets = []
+	for n in matching_nets:
+		if n.nodes["sprinkler"].value:
+			final_nets.append(n)
+
+	probability = float(len(final_nets)) / len(matching_nets)
+	print "Finished Problem 1C, P(s = true | w = true) = {0}".format(probability)
+
+def OneD():
+	matching_nets = []
+	i = iter(samples)
+	for _ in range(0, num_trials):
+		net = Bayes()
+		net.traverse(i)
+		if net.nodes["wet"].value:
+			matching_nets.append(net)
+
+	matching_nets2 = []
+	for n in matching_nets:
+		if n.nodes["cloudy"].value:
+			matching_nets2.append(n)
+		
+
+	final_nets = []
+	for n in matching_nets2:
+		if n.nodes["sprinkler"].value:
+			final_nets.append(n)
+
+	probability = float(len(final_nets)) / len(matching_nets2)
+	print "Finished Problem 1D, P(s = true | c = true, w = true) = {0}".format(probability)
+
 
 if __name__ == "__main__":
 	OneA()
 	OneB()
+	OneC()
+	OneD()
