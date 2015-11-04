@@ -258,18 +258,19 @@ def ThreeD():
 		if net.nodes["cloudy"].marginal > s:
 			net.nodes["cloudy"].value = True
 			s = next(i, None)
+			if (net.nodes["sprinkler"].conditionals["c"] > s):
+				net.nodes["sprinkler"].set_value(True)
+			else:
+				net.nodes["sprinkler"].set_value(False)
+
+			s = next(i, None)
 			if net.nodes["rain"].conditionals["c"] > s:
 				net.nodes["rain"].value = True
 			else:
 				# Not raining, we don't care about anything moving forward
 				net.nodes["rain"].value = False
 
-			s = next(i, None)
 
-			if (net.nodes["sprinkler"].conditionals["c"] > s):
-				net.nodes["sprinkler"].set_value(True)
-			else:
-				net.nodes["sprinkler"].set_value(False)
 		else:
 			net.nodes["cloudy"].value = False
 			# We can stop now
