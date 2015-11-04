@@ -79,37 +79,37 @@ class Bayes:
 		for i in range(0, 4):
 			scoped_samples.append(iterator.next())
 
-		if (cloudy.marginal >= scoped_samples[0]):
+		if (cloudy.marginal > scoped_samples[0]):
 			cloudy.set_value(True)
-			if (sprinkler.conditionals["c"] >= scoped_samples[1]):
+			if (sprinkler.conditionals["c"] > scoped_samples[1]):
 				sprinkler.set_value(True)
 			else:
 				sprinkler.set_value(False)
 			
-			if (rain.conditionals["c"] >= scoped_samples[2]):
+			if (rain.conditionals["c"] > scoped_samples[2]):
 				rain.set_value(True)
 			else:
 				rain.set_value(False)
 		else:
 			cloudy.set_value(False)
-			if (sprinkler.conditionals["~c"] >= scoped_samples[1]):
+			if (sprinkler.conditionals["~c"] > scoped_samples[1]):
 				sprinkler.set_value(True)
 			else:
 				sprinkler.set_value(False)
 			
-			if (rain.conditionals["~c"] >= scoped_samples[2]):
+			if (rain.conditionals["~c"] > scoped_samples[2]):
 				rain.set_value(True)
 			else:
 				rain.set_value(False)
 
 		if (sprinkler.value is True and rain.value is True):
-			if (wet.conditionals["sr"] >= scoped_samples[3]):
+			if (wet.conditionals["sr"] > scoped_samples[3]):
 				wet.set_value(True)
 		elif (sprinkler.value is True and rain.value is False):
-			if (wet.conditionals["s~r"] >= scoped_samples[3]):
+			if (wet.conditionals["s~r"] > scoped_samples[3]):
 				wet.set_value(True)
 		elif (sprinkler.value is False and rain.value is True):
-			if (wet.conditionals["~sr"] >= scoped_samples[3]):
+			if (wet.conditionals["~sr"] > scoped_samples[3]):
 				wet.set_value(True)
 		else:
 			wet.set_value(False)
@@ -196,7 +196,7 @@ def ThreeA():
 	s = next(i, None)
 	while s is not None:
 		# Only calculate C, that's all we care about
-		if s >= net.nodes["cloudy"].marginal:
+		if s < net.nodes["cloudy"].marginal:
 			cloudy_true = cloudy_true + 1
 		s = next(i, None)
 
@@ -212,10 +212,10 @@ def ThreeB():
 	s = next(i, None) 
 	while s is not None:
 		net = Bayes()
-		if net.nodes["cloudy"].marginal >= s:
+		if net.nodes["cloudy"].marginal > s:
 			net.nodes["cloudy"].value = True
 			s = next(i, None)
-			if net.nodes["rain"].conditionals["c"] >= s:
+			if net.nodes["rain"].conditionals["c"] > s:
 				net.nodes["rain"].value = True
 				nets.append(net)
 			else:
@@ -225,7 +225,7 @@ def ThreeB():
 		else:
 			net.nodes["cloudy"].value = False
 			s = next(i, None)
-			if net.nodes["rain"].conditionals["~c"] >= s:
+			if net.nodes["rain"].conditionals["~c"] > s:
 				net.nodes["rain"].value = True
 				nets.append(net)
 			else:
@@ -255,10 +255,10 @@ def ThreeD():
 	s = next(i, None) 
 	while s is not None:
 		net = Bayes()
-		if net.nodes["cloudy"].marginal >= s:
+		if net.nodes["cloudy"].marginal > s:
 			net.nodes["cloudy"].value = True
 			s = next(i, None)
-			if net.nodes["rain"].conditionals["c"] >= s:
+			if net.nodes["rain"].conditionals["c"] > s:
 				net.nodes["rain"].value = True
 			else:
 				# Not raining, we don't care about anything moving forward
@@ -266,7 +266,7 @@ def ThreeD():
 
 			s = next(i, None)
 
-			if (net.nodes["sprinkler"].conditionals["c"] >= s):
+			if (net.nodes["sprinkler"].conditionals["c"] > s):
 				net.nodes["sprinkler"].set_value(True)
 			else:
 				net.nodes["sprinkler"].set_value(False)
@@ -283,13 +283,13 @@ def ThreeD():
 		sprinkler = net.nodes["sprinkler"]
 
 		if (sprinkler.value is True and rain.value is True):
-			if (wet.conditionals["sr"] >= s):
+			if (wet.conditionals["sr"] > s):
 				wet.set_value(True)
 		elif (sprinkler.value is True and rain.value is False):
-			if (wet.conditionals["s~r"] >= s):
+			if (wet.conditionals["s~r"] > s):
 				wet.set_value(True)
 		elif (sprinkler.value is False and rain.value is True):
-			if (wet.conditionals["~sr"] >= s):
+			if (wet.conditionals["~sr"] > s):
 				wet.set_value(True)
 		else:
 			wet.set_value(False)
