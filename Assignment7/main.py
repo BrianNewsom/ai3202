@@ -146,7 +146,7 @@ def OneB():
 	probability = float(len(final_nets)) / len(matching_nets)
 	print "Finished Problem 1B, P(c = true | r = true) = {0}".format(probability)
 
-def OneC():
+def OneC(problem=1):
 	matching_nets = []
 	i = iter(samples)
 	for _ in range(0, num_trials):
@@ -161,7 +161,7 @@ def OneC():
 			final_nets.append(n)
 
 	probability = float(len(final_nets)) / len(matching_nets)
-	print "Finished Problem 1C, P(s = true | w = true) = {0}".format(probability)
+	print "Finished Problem {0}C, P(s = true | w = true) = {1}".format(problem, probability)
 
 def OneD():
 	matching_nets = []
@@ -244,7 +244,7 @@ def ThreeB():
 
 def ThreeC():
 	# Since we need all info to calculate the probability of wet, we are doing the same thing as in OneC
-	OneC()
+	OneC(3)
 
 def ThreeD():
 	# Similar to above, however this time we are given cloudy. This means any non-cloudy experiment can be immediately tossed.
