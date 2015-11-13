@@ -1,5 +1,7 @@
 import string
 
+ALPHABET = string.ascii_lowercase + '_'
+
 class State:
 	def __init__(self, letter):
 		# Values we need to calculate state data
@@ -13,14 +15,39 @@ class State:
 		self.emissions = {}
 		self.transitions = {}
 
+	def gen_emissions(s):
+		nums = {}
+		for c in ALPHABET:
+			nums[c] = sum(e == c for e in s.evidence)
+
+		for c in ALPHABET:
+			s.emissions[c] = float(nums[c])/(len(s.evidence))
+			print "P(E[{0}] | X[{1}]) = {2}".format(c, s.letter, s.emissions[c])
+
+	def gen_marginal(s, total):
+		try:
+			s.marginal = float(s.count) / total
+			print "P({0}) = {1}".format(s.letter, s.marginal)
+		except ZeroDivisionError:
+			print "Total is 0"
+
+	def gen_transitions(s):
+		nums = {}
+		for c in ALPHABET:
+			nums[c] = sum(t == c for t in s.next)
+
+		for c in ALPHABET:
+			# Smoothen
+			s.transitions[c] = float(nums[c] + 1)/(len(ALPHABET) + len(s.next))
+			print "P(X[{0}] | X[{1}]) = {2}".format(c, s.letter, s.transitions[c])
+
 class HMM:
-	ALPHABET = string.ascii_lowercase + '_'
 	def __init__(self):
 		# 'a' -> ['a','b','c','d','e','a']
 		# Create states
 		self.states = {}
 		self.total = 0
-		for c in self.ALPHABET:
+		for c in ALPHABET:
 			s = State(c)
 			self.states[c] = s
 
@@ -29,21 +56,21 @@ class HMM:
 
 	def generate_probabilities(self):
 		print "<------ Marginals -------->"
-		for c in self.ALPHABET:
+		for c in ALPHABET:
 			s = self.states[c]
-			self.gen_marginal(s)
+			s.gen_marginal(self.total)
 		print "</----- Marginals -------/>"
 
 		print "<------ Emissions -------->"
-		for c in self.ALPHABET:
+		for c in ALPHABET:
 			s = self.states[c]
-			self.gen_emissions(s)
+			s.gen_emissions()
 		print "</----- Emissions -------/>"
 		
 		print "<------ Transitions -------->"
-		for c in self.ALPHABET:
+		for c in ALPHABET:
 			s = self.states[c]
-			self.gen_transitions(s)
+			s.gen_transitions()
 		print "</----- Transitions -------/>"
 
 	def add_evidence(self, s, e):
@@ -55,33 +82,6 @@ class HMM:
 		# Kill the new line char
 		return (a, b[0])
 		
-	def gen_emissions(self, s):
-		nums = {}
-		for c in self.ALPHABET:
-			nums[c] = sum(e == c for e in s.evidence)
-
-		for c in self.ALPHABET:
-			s.emissions[c] = float(nums[c])/(len(self.states[c].evidence))
-			print "P(E[{0}] | X[{1}]) = {2}".format(c, s.letter, s.emissions[c])
-
-
-
-	def gen_marginal(self, s):
-		try:
-			s.marginal = float(s.count) / self.total
-			print "P({0}) = {1}".format(s.letter, s.marginal)
-		except ZeroDivisionError:
-			print "Total is 0"
-
-	def gen_transitions(self, s):
-		nums = {}
-		for c in self.ALPHABET:
-			nums[c] = sum(t == c for t in s.next)
-
-		for c in self.ALPHABET:
-			# Smoothen
-			s.transitions[c] = float(nums[c] + 1)/(len(self.ALPHABET) + len(s.next))
-			print "P(X[{0}] | X[{1}]) = {2}".format(c, s.letter, s.transitions[c])
 
 	def parse_data(self):
 		print "Parsing data"
