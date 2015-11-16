@@ -1,4 +1,5 @@
 import string
+import math
 
 ALPHABET = string.ascii_lowercase + '_'
 
@@ -21,13 +22,13 @@ class State:
 			nums[c] = sum(e == c for e in s.evidence)
 
 		for c in ALPHABET:
-			s.emissions[c] = float(nums[c])/(len(s.evidence))
-			print "P(E[{0}] | X[{1}]) = {2}".format(c, s.letter, s.emissions[c])
+			s.emissions[c] = float(nums[c] + 1)/(len(ALPHABET) + len(s.evidence))
+			# print "P(E[{0}] | X[{1}]) = {2}".format(c, s.letter, s.emissions[c])
 
 	def gen_marginal(s, total):
 		try:
 			s.marginal = float(s.count) / total
-			print "P({0}) = {1}".format(s.letter, s.marginal)
+			#print "P({0}) = {1}".format(s.letter, s.marginal)
 		except ZeroDivisionError:
 			print "Total is 0"
 
@@ -39,7 +40,7 @@ class State:
 		for c in ALPHABET:
 			# Smoothen
 			s.transitions[c] = float(nums[c] + 1)/(len(ALPHABET) + len(s.next))
-			print "P(X[{0}] | X[{1}]) = {2}".format(c, s.letter, s.transitions[c])
+			#print "P(X[{0}] | X[{1}]) = {2}".format(c, s.letter, s.transitions[c])
 
 class HMM:
 	def __init__(self):
@@ -81,7 +82,6 @@ class HMM:
 		(a, b) = l.split(' ')
 		# Kill the new line char
 		return (a, b[0])
-		
 
 	def parse_data(self):
 		print "Parsing data"
@@ -98,5 +98,75 @@ class HMM:
 
 				prev = s
 
+	def viterbi(self, data):
+		# After initialization - run viterbi on some data
+		V = [{}]
+		path = {}
+
+		def log(x):
+			base = 10
+			return math.log(x, base)
+
+		# Initialize base case
+		for c in self.states:
+			s = self.states[c]
+			V[0][c] =10 +  s.emissions[data[0]]
+			path[c] = [c]
+		print "Finished initializing"
+			
+		def get_max_next(t,c):
+			options = []
+			for s0 in self.states:
+				a = 10 + V[t-1][s0]
+				b = s.transitions[s0]
+				c = s.emissions[data[t]]
+				try:
+					if a > 0 and b > 0 and c > 0:
+						(prob, state) = (a + log(b) + log(c), s0)
+						options.append((prob, state))
+					else:
+						print a
+		
+				except ValueError:
+					print "Tried to log 0"
+
+			mx = (0, None)
+			if options:
+				mx = max(options) 
+			return mx
+
+		# Run viterbi
+		for t in range(1, len(data)):
+			V.append({})
+			tmp_path = {}
+			for c in self.states:
+				s = self.states[c]
+				(prob, state) = get_max_next(t,c)
+				if state:
+					V[t][c] = prob
+					tmp_path[c] = path[state] + [c]
+			
+			# Set optimal for each path
+			path = tmp_path
+
+		n = len(data) - 1
+		(prob, state) = max((V[n][c], c) for c in self.states)
+		print data
+		print path[state]
+		return (prob, path[state])
+
+def get_viterbi_input(file_name):
+	data = []
+	with open(file_name) as f:
+		for l in f:
+			data.append(l[2])
+
+	return data
+
 if __name__ == "__main__":
 	hmm = HMM()
+
+	data = get_viterbi_input('./data/typos20_test.data')
+
+	hmm.viterbi(data)
+
