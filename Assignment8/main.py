@@ -21,26 +21,43 @@ class State:
 		for c in ALPHABET:
 			nums[c] = sum(e == c for e in s.evidence)
 
+		e = {}
 		for c in ALPHABET:
-			s.emissions[c] = float(nums[c] + 1)/(len(ALPHABET) + len(s.evidence))
+			z = float(nums[c] + 1)/(len(ALPHABET) + len(s.evidence))
+			if z >= 0:
+				e[c] = math.log(z)
+			else:
+				e[c] = 0
 			# print "P(E[{0}] | X[{1}]) = {2}".format(c, s.letter, s.emissions[c])
+
+		s.emissions = e
 
 	def gen_marginal(s, total):
 		try:
-			s.marginal = float(s.count) / total
+			m = float(s.count) / total
+			if m >= 0:
+				s.marginal = math.log(m)
+			else:
+				s.marginal = 0
 			#print "P({0}) = {1}".format(s.letter, s.marginal)
 		except ZeroDivisionError:
 			print "Total is 0"
 
 	def gen_transitions(s):
 		nums = {}
+		t = {}
 		for c in ALPHABET:
 			nums[c] = sum(t == c for t in s.next)
 
 		for c in ALPHABET:
 			# Smoothen
-			s.transitions[c] = float(nums[c] + 1)/(len(ALPHABET) + len(s.next))
+			z = float(nums[c] + 1)/(len(ALPHABET) + len(s.next))
+			if z >= 0:
+				t[c] = math.log(z)
+			else:
+				t[c] = 0
 			#print "P(X[{0}] | X[{1}]) = {2}".format(c, s.letter, s.transitions[c])
+		s.transitions = t
 
 class HMM:
 	def __init__(self):
@@ -104,29 +121,30 @@ class HMM:
 		path = {}
 
 		def log(x):
-			base = 10
-			return math.log(x, base)
+			base = 0.1
+			return math.log(x)#, base)
 
 		# Initialize base case
 		for c in self.states:
 			s = self.states[c]
-			V[0][c] =10 +  s.emissions[data[0]]
+			print c
+			print s.marginal
+			print s.emissions[c]
+			V[0][c] = s.marginal + s.emissions[c]
 			path[c] = [c]
+
+		print V[0]
 		print "Finished initializing"
-			
+
 		def get_max_next(t,c):
 			options = []
 			for s0 in self.states:
-				a = 10 + V[t-1][s0]
+				a = V[t-1][s0]
 				b = s.transitions[s0]
-				c = s.emissions[data[t]]
+				c = s.emissions[data[t-1]]
 				try:
-					if a > 0 and b > 0 and c > 0:
-						(prob, state) = (a + log(b) + log(c), s0)
-						options.append((prob, state))
-					else:
-						print a
-		
+					(prob, state) = (a + b + c, s0)
+					options.append((prob, state))
 				except ValueError:
 					print "Tried to log 0"
 
