@@ -2,6 +2,7 @@ import string
 import math
 
 ALPHABET = string.ascii_lowercase + '_'
+NEG_INFINITY = -1000000000000000000000000000000
 
 class State:
 	def __init__(self, letter):
@@ -23,11 +24,11 @@ class State:
 
 		e = {}
 		for c in ALPHABET:
-			z = float(nums[c] + 1)/(len(ALPHABET) + len(s.evidence))
-			if z >= 0:
+			z = float(nums[c])/(len(s.evidence))
+			if z > 0:
 				e[c] = math.log(z)
 			else:
-				e[c] = 0
+				e[c] = NEG_INFINITY
 			# print "P(E[{0}] | X[{1}]) = {2}".format(c, s.letter, s.emissions[c])
 
 		s.emissions = e
@@ -35,10 +36,10 @@ class State:
 	def gen_marginal(s, total):
 		try:
 			m = float(s.count) / total
-			if m >= 0:
+			if m > 0:
 				s.marginal = math.log(m)
 			else:
-				s.marginal = 0
+				s.marginal = NEG_INFINITY
 			#print "P({0}) = {1}".format(s.letter, s.marginal)
 		except ZeroDivisionError:
 			print "Total is 0"
@@ -52,10 +53,10 @@ class State:
 		for c in ALPHABET:
 			# Smoothen
 			z = float(nums[c] + 1)/(len(ALPHABET) + len(s.next))
-			if z >= 0:
+			if z > 0:
 				t[c] = math.log(z)
 			else:
-				t[c] = 0
+				t[c] = NEG_INFINITY
 			#print "P(X[{0}] | X[{1}]) = {2}".format(c, s.letter, s.transitions[c])
 		s.transitions = t
 
@@ -131,17 +132,18 @@ class HMM:
 			print s.marginal
 			print s.emissions[c]
 			V[0][c] = s.marginal + s.emissions[c]
+			V[0]['b'] = 1000000000
 			path[c] = [c]
 
 		print V[0]
 		print "Finished initializing"
 
-		def get_max_next(t,c):
+		def get_max_next(t,s):
 			options = []
 			for s0 in self.states:
 				a = V[t-1][s0]
 				b = s.transitions[s0]
-				c = s.emissions[data[t-1]]
+				c = s.emissions[data[t]]
 				try:
 					(prob, state) = (a + b + c, s0)
 					options.append((prob, state))
@@ -159,7 +161,7 @@ class HMM:
 			tmp_path = {}
 			for c in self.states:
 				s = self.states[c]
-				(prob, state) = get_max_next(t,c)
+				(prob, state) = get_max_next(t,s)
 				if state:
 					V[t][c] = prob
 					tmp_path[c] = path[state] + [c]
