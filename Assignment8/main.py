@@ -128,14 +128,11 @@ class HMM:
 		# Initialize base case
 		for c in self.states:
 			s = self.states[c]
-			print c
-			print s.marginal
-			print s.emissions[c]
-			V[0][c] = s.marginal + s.emissions[c]
-			V[0]['b'] = 1000000000
+			V[0][c] = s.marginal + s.emissions[data[0]]
 			path[c] = [c]
 
-		print V[0]
+		# Bias our first letter to be b
+
 		print "Finished initializing"
 
 		def get_max_next(t,s):
@@ -148,12 +145,12 @@ class HMM:
 					(prob, state) = (a + b + c, s0)
 					options.append((prob, state))
 				except ValueError:
-					print "Tried to log 0"
+					print "Error in probability calculation"
 
 			mx = (0, None)
 			if options:
 				mx = max(options) 
-			return mx
+				return mx
 
 		# Run viterbi
 		for t in range(1, len(data)):
@@ -162,31 +159,46 @@ class HMM:
 			for c in self.states:
 				s = self.states[c]
 				(prob, state) = get_max_next(t,s)
-				if state:
-					V[t][c] = prob
-					tmp_path[c] = path[state] + [c]
+				V[t][c] = prob
+				tmp_path[c] = path[state] + [c]
 			
 			# Set optimal for each path
 			path = tmp_path
 
 		n = len(data) - 1
 		(prob, state) = max((V[n][c], c) for c in self.states)
-		print data
-		print path[state]
-		return (prob, path[state])
+		return path[state]
 
 def get_viterbi_input(file_name):
 	data = []
+	actual = []
 	with open(file_name) as f:
 		for l in f:
 			data.append(l[2])
+			actual.append(l[0])
 
-	return data
+	return (data, actual)
+
+def print_path(path):
+	for d in path:
+		print d
+
+def get_error(path, actual):
+	t = len(path)
+	correct = 0
+	for i in range(0, t):
+		if path[i] is actual[i]:
+			correct += 1
+
+	return 1 - (float(correct) / t)
 
 if __name__ == "__main__":
 	hmm = HMM()
 
-	data = get_viterbi_input('./data/typos20_test.data')
+	(data, actual) = get_viterbi_input('./data/typos20_test.data')
 
-	hmm.viterbi(data)
+	path = hmm.viterbi(data)
 
+	print_path(path)
+
+	print get_error(path, actual)
