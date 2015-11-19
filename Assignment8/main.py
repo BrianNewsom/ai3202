@@ -1,8 +1,9 @@
 import string
 import math
+import sys
 
 ALPHABET = string.ascii_lowercase + '_'
-NEG_INFINITY = -1000000000000000000000000000000
+NEG_INFINITY = -sys.maxint - 1
 
 class State:
 	def __init__(self, letter):
