@@ -103,18 +103,21 @@ class HMM:
 
 	def parse_data(self):
 		print "Parsing data"
-		with open('./data/typos.data') as f:
+		with open('./data/typos20.data') as f:
 			prev = ''
 			for l in f:
-				(s, e) = self.parse_line(l)
-				self.states[s].count = self.states[s].count + 1
-				self.add_evidence(s, e)
-				self.total = self.total + 1
+				try:
+					(s, e) = self.parse_line(l)
+					self.states[s].count = self.states[s].count + 1
+					self.add_evidence(s, e)
+					self.total = self.total + 1
 
-				if prev:
-					self.states[prev].next.append(s)
+					if prev:
+						self.states[prev].next.append(s)
 
-				prev = s
+					prev = s
+				except ValueError:
+					print l
 
 	def viterbi(self, data):
 		# After initialization - run viterbi on some data
@@ -139,7 +142,8 @@ class HMM:
 			options = []
 			for s0 in self.states:
 				a = V[t-1][s0]
-				b = s.transitions[s0]
+				# Transitions are backwards, flip from expected
+				b = self.states[s0].transitions[s.letter]
 				c = s.emissions[data[t]]
 				try:
 					(prob, state) = (a + b + c, s0)
@@ -195,7 +199,7 @@ def get_error(path, actual):
 if __name__ == "__main__":
 	hmm = HMM()
 
-	(data, actual) = get_viterbi_input('./data/typos20_test.data')
+	(data, actual) = get_viterbi_input('./data/typos20Test.data')
 
 	path = hmm.viterbi(data)
 
