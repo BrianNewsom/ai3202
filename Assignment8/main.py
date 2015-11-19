@@ -74,23 +74,23 @@ class HMM:
 		self.generate_probabilities()
 
 	def generate_probabilities(self):
-		print "<------ Marginals -------->"
+		# print "<------ Marginals -------->"
 		for c in ALPHABET:
 			s = self.states[c]
 			s.gen_marginal(self.total)
-		print "</----- Marginals -------/>"
+		# print "</----- Marginals -------/>"
 
-		print "<------ Emissions -------->"
+		# print "<------ Emissions -------->"
 		for c in ALPHABET:
 			s = self.states[c]
 			s.gen_emissions()
-		print "</----- Emissions -------/>"
+		# print "</----- Emissions -------/>"
 		
-		print "<------ Transitions -------->"
+		# print "<------ Transitions -------->"
 		for c in ALPHABET:
 			s = self.states[c]
 			s.gen_transitions()
-		print "</----- Transitions -------/>"
+		# print "</----- Transitions -------/>"
 
 	def add_evidence(self, s, e):
 		self.states[s].evidence.append(e)
@@ -102,7 +102,7 @@ class HMM:
 		return (a, b[0])
 
 	def parse_data(self):
-		print "Parsing data"
+		# print "Parsing data"
 		with open('./data/typos20.data') as f:
 			prev = ''
 			for l in f:
@@ -117,7 +117,8 @@ class HMM:
 
 					prev = s
 				except ValueError:
-					print l
+					# If we have a bad line, just ignore it :p
+					pass
 
 	def viterbi(self, data):
 		# After initialization - run viterbi on some data
@@ -134,9 +135,6 @@ class HMM:
 			V[0][c] = s.marginal + s.emissions[data[0]]
 			path[c] = [c]
 
-		# Bias our first letter to be b
-
-		print "Finished initializing"
 
 		def get_max_next(t,s):
 			options = []
@@ -184,6 +182,7 @@ def get_viterbi_input(file_name):
 	return (data, actual)
 
 def print_path(path):
+	# This print is so ugly, but is required by the pdf
 	for d in path:
 		print d
 
@@ -194,15 +193,23 @@ def get_error(path, actual):
 		if path[i] is actual[i]:
 			correct += 1
 
-	return 1 - (float(correct) / t)
+	return "{0:.2f}%".format(100 * (1 - (float(correct) / t)))
 
 if __name__ == "__main__":
+
 	hmm = HMM()
+
+	print "Successfully initialized HMM"
 
 	(data, actual) = get_viterbi_input('./data/typos20Test.data')
 
 	path = hmm.viterbi(data)
 
+	print "Printing Viterbi'd output: "
 	print_path(path)
 
+	print "Error before Viterbi: "
+	print get_error(data, actual) 
+
+	print "Error after Viterbi: "
 	print get_error(path, actual)
